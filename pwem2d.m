@@ -1,4 +1,4 @@
-function K0 = pwem2d(DEV,SYM,RES,PQ,MODE)
+function K0 = pwem2d(DEV,SYM,BETA,RES,PQ,MODE)
   % K0 = pwem2d(DEV,GRID,RES,PQ,MODE) Plane Wave Expansion Method
   %
   % INPUT ARGUMENTS
@@ -13,6 +13,8 @@ function K0 = pwem2d(DEV,SYM,RES,PQ,MODE)
   %             symmetry.
   %   .NP       Number of points to be used in band diagram calculation
   %   .POINTS   Array containing all symmetry points
+  %
+  % BETA        Array containing wave vector expansions
   %
   % RES         Grid resolution
   %   RES(1)    x-axis resolution
