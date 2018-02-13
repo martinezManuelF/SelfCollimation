@@ -113,17 +113,18 @@ D = [0 ; 0];
 X = 0.5*DEV.T2;
 Z = 0.5*DEV.T1 + 0.5*DEV.T2;
 M = 0.5*DEV.T1;
-E = 0.5*DEV.T1 - 0.5.*DEV.T2;
-G = -0.5*DEV.T2;
+E = 0.5*DEV.T1 + 0.5.*DEV.T2;
+Z = 0.5*DEV.T1 + DEV.T2;
+SYM.POINTS = [G , D , X , E , M , Z];
 
 if (MODE.BC == 1)
     % Generate list of Bloch Wave Vectors
-    bx = [ linspace(D(1),X(1),NP1/2), linspace(X(1),Z(1),NP1/2) , ...
-            linspace(Z(1),M(1),NP1/2) , linspace(M(1),E(1),NP1/2) , ...
-            linspace(E(1),G(1),NP1/2) , linspace(G(1),D(1),NP1/2) ];
-    by = [ linspace(D(2),X(2),NP1/2), linspace(X(2),Z(2),NP1/2) , ...
-            linspace(Z(2),M(2),NP1/2) , linspace(M(2),E(2),NP1/2) , ...
-            linspace(E(2),G(2),NP1/2) , linspace(G(2),D(2),NP1/2)];
+    bx = [ linspace(G(1),D(1),NP1/2), linspace(D(1),X(1),NP1/2) , ...
+            linspace(X(1),E(1),NP1/2) , linspace(E(1),M(1),NP1/2) , ...
+            linspace(M(1),Z(1),NP1/2) , linspace(Z(1),G(1),NP1/2) ];
+    by = [ linspace(G(2),D(2),NP1/2), linspace(D(2),X(2),NP1/2) , ...
+            linspace(X(2),E(2),NP1/2) , linspace(E(2),M(2),NP1/2) , ...
+            linspace(M(2),Z(2),NP1/2) , linspace(Z(2),G(2),NP1/2)];
     BETA = [ bx ; by ];
 elseif (MODE.BC == 2)
     bx      = linspace(-pi,+pi,SYM.NP);
