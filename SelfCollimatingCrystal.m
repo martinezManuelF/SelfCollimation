@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FILENAME:         BandDiagrams.m
+% FILENAME:         SelfCollimatingCrystal.m
 % COURSE:           EE5322--21st Century Electromagnetics
 % INSTRUCTOR:       Raymond C. Rumpf
 % NAME:             Manuel F. Martinez
@@ -42,7 +42,7 @@ c0 = 299792458 * meters/seconds;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % SUPERCELL PARAMETERS
-a   = 1;
+a   = 0.0111 * meters;
 w   = 0.8 * a;
 er1 = 9.0;
 er2 = 1.0;
@@ -89,13 +89,15 @@ end
 
 % VISUALIZE SUPER CELL
 figure('Color','w');
-c = imagesc(xa,ya,DEV.ER');
+c = imagesc(xa/millimeters,ya/millimeters,DEV.ER');
 axis equal tight;
-title('$\textrm{Unit Cell}$','Interpreter','LaTex','FontSize',15);
-colormap(gray);
-colorbar;
+colormap(jet);
+box off;
 c = get(c,'Parent');
 set(c,'FontSize',12);
+set(c,'XTick',[],'XTickLabel',[],'YTick',[],'YTickLabel',[]);
+% gtext('$\varepsilon_1$','Color','w','FontSize',40,'Interpreter','LaTex');
+% gtext('$\varepsilon_2$','Color','w','FontSize',40,'Interpreter','LaTex');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% BEGIN PWEM
@@ -126,8 +128,8 @@ if (MODE.BC == 1)
             linspace(E(2),G(2),NP1) , linspace(G(2),D(2),NP1)];
     BETA = [ bx ; by ];
 elseif (MODE.BC == 2)
-    bx      = linspace(-pi,+pi,SYM.NP);
-    by      = linspace(+pi,-pi,SYM.NP);
+    bx      = linspace(-pi/a,+pi/a,SYM.NP);
+    by      = linspace(+pi/a,-pi/a,SYM.NP);
     BETA    = zeros(2,SYM.NP^2);
     C       = 1;
     for x = 1 : SYM.NP
@@ -155,18 +157,18 @@ if (MODE.BC == 1)
     ylim([0 0.6]);
     xlim([1 length(bx)]);
     h2 = get(h(1),'Parent');
-    set(h2,'FontSize',12,'LineWidth',1.5);
+    set(h2,'FontSize',13,'LineWidth',1.5);
     title([MODE.EM '$\textrm{ Mode}$'],'FontSize',16,'Interpreter','LaTex')
     
     % Format x-Axis
     XT = [1 NP1 2*NP1 3*NP1 4*NP1 5*NP1 6*NP1];
     XL = {'\Delta','X','Z','M','\Sigma','\Gamma','\Delta'};
     set(h2,'XTick',XT,'XTickLabel',XL);
-    xlabel('Bloch Wave Vector ($\beta$)','Interpreter','LaTex','FontSize',13);
+    xlabel('Bloch Wave Vector ($\beta$)','Interpreter','LaTex','FontSize',14);
     
     % Format y-Axis
     ylabel('Normalized Frequency $\frac{\omega a}{2\pi c_0}$','Interpreter',...
-        'LaTex','FontSize',13,'Rotation',90);
+        'LaTex','FontSize',14,'Rotation',90);
     
 %     % Add Vertical Lines
     for n = 2 : length(XT)-1
@@ -182,12 +184,19 @@ if (MODE.BC == 1)
     vy  = [SQy(1) SQy(3) SQy(3) SQy(1) SQy(1)];
     fill(vx,vy,[198/255 226/255 255/255],'EdgeColor',...
         [198/255 226/255 255/255]);
-    text(vx(1)+0.5,vy(1),'$\Delta$','Interpreter','LaTex',...
+    text(SQx(2)-0.5,SQy(2),'$\Delta$','Interpreter','LaTex',...
         'HorizontalAlignment','Right');
-    text(vx(2)+0.5,vy(2),'M','Interpreter','LaTex',...
+    text(SQx(2)-0.5,SQy(3)+0.005,'X','Interpreter','LaTex',...
+        'HorizontalAlignment','Right');
+    text(vx(3)+0.5,vy(3),'Z','Interpreter','LaTex',...
         'HorizontalAlignment','Left');
-    text(vx(3)+0.5,vy(3),'X','Interpreter','LaTex',...
+    text(SQx(3)+0.5,SQy(2),'M','Interpreter','LaTex',...
         'HorizontalAlignment','Left');
+    text(SQx(3)+0.5,SQy(1),'$\Sigma$','Interpreter','LaTex',...
+        'HorizontalAlignment','Left');
+    text(SQx(2)-0.5,SQy(1)+0.005,'$\Gamma$','Interpreter','LaTex',...
+        'HorizontalAlignment','Right');
+
     for x = 1 : length(SQx)
         for y = 1 : length(SQy)
             plot(SQx(x),SQy(y),'ok','MarkerSize',3,'MarkerFaceColor','k');
@@ -203,15 +212,18 @@ if (MODE.BC == 1)
     set(a,'LineWidth',1,'Color','k');
     hold off;
 elseif (MODE.BC == 2)
+    figure('Color','w');
     % PLOT FULL BAND DIAGRAM
     for b = 1 : 7               % Just plot some bands
-        surf(reshape(WN(b,:),SYM.NP,SYM.NP));
+        a = surf(reshape(WN(b,:),SYM.NP,SYM.NP));
         shading interp;
         hold on;
         drawnow;
         view([-40,10]);
     end
     hold off;
+    a = get(a,'Parent');
+    set(a,'FontSize',12);
     title([MODE.EM '$\textrm{ Mode Full Band Diagram}$'],...
         'Interpreter','LaTex','FontSize',18);
     xlabel('\beta_x','FontSize',15);
@@ -220,17 +232,40 @@ elseif (MODE.BC == 2)
         'Interpreter','LaTex','FontSize',15);
     box on;
     colormap(jet);
-    T = [0 20 40];
-    L = {'\pi/2','0','-\pi/2'};
+    T = [1 20 40];
+    L = {'-\pi/a','0','\pi/a'};
     set(gca,'XTick',T,'XTickLabel',L,'YTick',T,'YTickLabel',L);
     
     % ISOFREQUENCY CONTOURS
     figure('Color','w');
     [C,H] = contour(reshape(WN(1,:),SYM.NP,SYM.NP),8,'LineWidth',1.5);
+    set(gca,'FontSize',13);
     title([MODE.EM '$\textrm{ Mode 1st Band Isofrequency Contour}$'],...
         'FontSize',15,'Interpreter','LaTex');
     xlabel('\beta_x','FontSize',12);
     ylabel('\beta_y','FontSize',12);
+    clabel(C,H,'FontSize',10);
+    colormap(jet);
+    T = [1 20 40];
+    L = {'-\pi/a','0','\pi/a'};
+    set(gca,'XTick',T,'XTickLabel',L,'YTick',T,'YTickLabel',L);
+    colorbar;
+    axis equal tight;
+    
+    figure('Color','w');
+    [C,H] = contour(reshape(WN(2,:),SYM.NP,SYM.NP),8,'LineWidth',1.5);
+    set(gca,'FontSize',13);
+    title([MODE.EM '$\textrm{ Mode 2nd Band Isofrequency Contour}$'],...
+        'FontSize',15,'Interpreter','LaTex');
+    xlabel('\beta_x','FontSize',12);
+    ylabel('\beta_y','FontSize',12);
+    clabel(C,H,'FontSize',10);
+    colormap(jet);
+    T = [1 20 40];
+    L = {'-\pi/a','0','\pi/a'};
+    set(gca,'XTick',T,'XTickLabel',L,'YTick',T,'YTickLabel',L);
+    colorbar;
+    axis equal tight;
     
 end
     
